@@ -1,8 +1,7 @@
 /**
- * Yatra Technologies - Interactive Website Engine
- * Core JavaScript: Theme switcher, Mobile Drawer, Cost Estimator,
- * Portfolio Filters, Modals, FAQ Accordion, Testimonial Slider,
- * Form Validation, and Toast Notification System.
+ * Yatra Technologies — Interactive Website Engine
+ * Inspired by LeadingEdgeSoft: Working Process Stepper, Counter Animations,
+ * Dual Marquees, Estimator, Testimonials, Form Validation, and Theme Engine.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -87,51 +86,35 @@ document.addEventListener('DOMContentLoaded', () => {
     if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
 
     drawerLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            closeDrawer();
-        });
+        link.addEventListener('click', closeDrawer);
     });
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            closeDrawer();
-            closeModal();
-        }
+        if (e.key === 'Escape') closeDrawer();
     });
 
     // ----------------------------------------------------
-    // 3. SCROLLSPY & HEADER ENHANCEMENT
+    // 3. SCROLLSPY & HEADER STICKY STATE
     // ----------------------------------------------------
     const header = document.querySelector('.header');
-    const sections = document.querySelectorAll('section[id]');
+    const sections = document.querySelectorAll('section[id], header[id]');
     const navLinks = document.querySelectorAll('.nav-links a');
     const backToTopBtn = document.getElementById('back-to-top');
 
     function handleScroll() {
         const scrollY = window.pageYOffset;
 
-        // Header glass styling on scroll
         if (header) {
-            if (scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
+            header.classList.toggle('scrolled', scrollY > 40);
         }
 
-        // Back to top visibility
         if (backToTopBtn) {
-            if (scrollY > 500) {
-                backToTopBtn.classList.add('visible');
-            } else {
-                backToTopBtn.classList.remove('visible');
-            }
+            backToTopBtn.classList.toggle('visible', scrollY > 400);
         }
 
-        // Scrollspy for active link
         let currentSectionId = '';
         sections.forEach(section => {
-            const sectionTop = section.offsetTop - 150;
+            const sectionTop = section.offsetTop - 140;
             const sectionHeight = section.offsetHeight;
             if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
                 currentSectionId = section.getAttribute('id');
@@ -156,55 +139,132 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------
-    // 4. ANIMATED STATS COUNTER
+    // 4. ANIMATED COUNTERS (Hero Trust & Flagship Stats)
     // ----------------------------------------------------
-    const statElements = document.querySelectorAll('.stat-number');
-    let statsAnimated = false;
+    const countElements = document.querySelectorAll('[data-count]');
+    let countsAnimated = false;
 
-    function animateCounters() {
-        statElements.forEach(stat => {
-            const target = parseFloat(stat.getAttribute('data-target') || '0');
-            const suffix = stat.getAttribute('data-suffix') || '';
-            const isDecimal = target % 1 !== 0;
-            const duration = 1800; // ms
+    function animateAllCounters() {
+        countElements.forEach(el => {
+            const target = parseInt(el.getAttribute('data-count') || '0', 10);
+            const duration = 1600;
             const startTime = performance.now();
 
-            function updateCounter(now) {
+            function update(now) {
                 const elapsed = now - startTime;
                 const progress = Math.min(elapsed / duration, 1);
-                // easeOutExpo
+                // Ease out expo
                 const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-                const currentVal = ease * target;
-
-                stat.textContent = isDecimal ? currentVal.toFixed(1) + suffix : Math.floor(currentVal) + suffix;
+                const current = Math.floor(ease * target);
+                el.textContent = current;
 
                 if (progress < 1) {
-                    requestAnimationFrame(updateCounter);
+                    requestAnimationFrame(update);
                 } else {
-                    stat.textContent = (isDecimal ? target.toFixed(1) : target) + suffix;
+                    el.textContent = target;
                 }
             }
 
-            requestAnimationFrame(updateCounter);
+            requestAnimationFrame(update);
         });
     }
 
-    const statsSection = document.querySelector('.about-stat') || document.querySelector('.stats-container');
-    if (statsSection) {
-        const statsObserver = new IntersectionObserver((entries) => {
+    // Intersection observer for counters
+    const firstCounterEl = countElements[0];
+    if (firstCounterEl) {
+        const counterObserver = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting && !statsAnimated) {
-                    statsAnimated = true;
-                    animateCounters();
+                if (entry.isIntersecting && !countsAnimated) {
+                    countsAnimated = true;
+                    animateAllCounters();
                 }
             });
-        }, { threshold: 0.3 });
+        }, { threshold: 0.1 });
 
-        statsObserver.observe(statsSection);
+        countElements.forEach(el => counterObserver.observe(el));
     }
 
     // ----------------------------------------------------
-    // 5. INTERACTIVE PROJECT COST ESTIMATOR
+    // 5. INTERACTIVE 4-STEP WORKING PROCESS (Leading Edge feature)
+    // ----------------------------------------------------
+    const stepButtons = document.querySelectorAll('.step-button');
+    const stepProgressBar = document.getElementById('step-progress');
+    const stepsText = document.getElementById('steps-text');
+    const stepsImage = document.getElementById('steps-image');
+
+    const stepDetails = {
+        1: {
+            title: "Discovery & Requirements",
+            text: "Here we analyze and discover all your business requirements, operational bottlenecks, and user workflows. We systematically prioritize features to eliminate risks before writing a single line of code.",
+            progress: 25,
+            tag: "Phase 1 / Discovery"
+        },
+        2: {
+            title: "Architecture & Sprint Planning",
+            text: "We architect resilient database schemas, cloud infrastructure, and interactive UI/UX prototypes. We then create clear bi-weekly sprint milestones with fixed deliverables and transparent timelines.",
+            progress: 50,
+            tag: "Phase 2 / Planning"
+        },
+        3: {
+            title: "Agile Development & QA",
+            text: "Our engineers build clean, modular code with continuous automated integration (CI/CD) and peer review. Weekly client staging demos ensure complete alignment every step of the way.",
+            progress: 75,
+            tag: "Phase 3 / Execute"
+        },
+        4: {
+            title: "Deployment, Training & SLA",
+            text: "We deploy to secure cloud infrastructure, train your internal staff, and monitor system telemetry 24/7. Every launch comes with a comprehensive 30-day warranty and ongoing SLA support.",
+            progress: 100,
+            tag: "Phase 4 / Delivery"
+        }
+    };
+
+    function setStep(stepNum) {
+        const data = stepDetails[stepNum];
+        if (!data) return;
+
+        // Update step buttons
+        stepButtons.forEach(btn => {
+            const num = parseInt(btn.getAttribute('data-step') || '1', 10);
+            btn.classList.toggle('active', num === stepNum);
+            btn.classList.toggle('completed', num < stepNum);
+        });
+
+        // Update progress bar
+        if (stepProgressBar) {
+            stepProgressBar.style.width = `${data.progress}%`;
+        }
+
+        // Update text with smooth transition
+        if (stepsText) {
+            stepsText.style.opacity = '0';
+            stepsText.style.transform = 'translateY(6px)';
+            setTimeout(() => {
+                stepsText.innerHTML = `
+                    <div class="step-badge-pill">${data.tag}</div>
+                    <h4>${data.title}</h4>
+                    <p>${data.text}</p>
+                `;
+                stepsText.style.opacity = '1';
+                stepsText.style.transform = 'translateY(0)';
+            }, 180);
+        }
+    }
+
+    stepButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const stepNum = parseInt(btn.getAttribute('data-step') || '1', 10);
+            setStep(stepNum);
+        });
+    });
+
+    // Initialize step 1
+    if (stepButtons.length > 0) {
+        setStep(1);
+    }
+
+    // ----------------------------------------------------
+    // 6. INTERACTIVE PROJECT SCOPE & COST ESTIMATOR
     // ----------------------------------------------------
     const platformInputs = document.querySelectorAll('input[name="calc-platform"]');
     const designInputs = document.querySelectorAll('input[name="calc-design"]');
@@ -219,7 +279,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let baseCost = 0;
         let baseWeeks = 0;
 
-        // Platform Selection
         platformInputs.forEach(input => {
             if (input.checked) {
                 baseCost += parseFloat(input.getAttribute('data-cost') || '0');
@@ -227,7 +286,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Design Selection
         designInputs.forEach(input => {
             if (input.checked) {
                 baseCost += parseFloat(input.getAttribute('data-cost') || '0');
@@ -235,17 +293,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Feature Checkboxes
-        let featureCount = 0;
         featureCheckboxes.forEach(checkbox => {
             if (checkbox.checked) {
                 baseCost += parseFloat(checkbox.getAttribute('data-cost') || '0');
                 baseWeeks += parseFloat(checkbox.getAttribute('data-weeks') || '0');
-                featureCount++;
             }
         });
 
-        // Delivery Pace Multiplier
         let speedMultiplier = 1;
         speedInputs.forEach(input => {
             if (input.checked) {
@@ -256,7 +310,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let totalCost = Math.round((baseCost * speedMultiplier) / 100) * 100;
         let totalWeeks = Math.max(2, Math.round(baseWeeks / (speedMultiplier > 1 ? 1.4 : 1)));
 
-        // Range representation
         const lowPrice = Math.round(totalCost * 0.9);
         const highPrice = Math.round(totalCost * 1.15);
 
@@ -267,12 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resultTime.textContent = `Approx. ${totalWeeks} - ${totalWeeks + 2} Weeks`;
         }
 
-        return {
-            lowPrice,
-            highPrice,
-            totalWeeks,
-            featureCount
-        };
+        return { lowPrice, highPrice, totalWeeks };
     }
 
     const allCalcInputs = [
@@ -281,33 +329,22 @@ document.addEventListener('DOMContentLoaded', () => {
         ...featureCheckboxes,
         ...speedInputs
     ];
-
-    allCalcInputs.forEach(el => {
-        el.addEventListener('change', calculateEstimate);
-    });
-
-    // Run once initially
+    allCalcInputs.forEach(el => el.addEventListener('change', calculateEstimate));
     calculateEstimate();
 
-    // Auto-fill into Contact Form
     if (applyEstimateBtn) {
         applyEstimateBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const est = calculateEstimate();
 
-            // Selected platform
             const selectedPlatform = document.querySelector('input[name="calc-platform"]:checked');
             const platformLabel = selectedPlatform ? selectedPlatform.parentElement.textContent.trim() : 'Digital Solution';
 
-            // Selected features
             const selectedFeatures = [];
             featureCheckboxes.forEach(cb => {
-                if (cb.checked) {
-                    selectedFeatures.push(cb.parentElement.textContent.trim());
-                }
+                if (cb.checked) selectedFeatures.push(cb.parentElement.textContent.trim());
             });
 
-            // Populate form fields
             const serviceSelect = document.getElementById('contact-service');
             const messageArea = document.getElementById('contact-message');
             const budgetSelect = document.getElementById('contact-budget');
@@ -327,197 +364,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (messageArea) {
-                messageArea.value = `Hi Yatra Team,\n\nI generated a project estimate using your calculator:\n• Scope: ${platformLabel}\n• Key Features: ${selectedFeatures.join(', ') || 'Custom Requirements'}\n• Estimated Budget: $${est.lowPrice.toLocaleString()} - $${est.highPrice.toLocaleString()}\n• Estimated Timeline: ${est.totalWeeks} - ${est.totalWeeks + 2} Weeks\n\nLooking forward to discussing this project in detail.`;
+                messageArea.value = `Hi Yatra Team,\n\nI generated an estimate using your calculator:\n• Target Scope: ${platformLabel}\n• Features: ${selectedFeatures.join(', ') || 'Custom Features'}\n• Estimated Budget: $${est.lowPrice.toLocaleString()} - $${est.highPrice.toLocaleString()}\n• Estimated Timeline: ${est.totalWeeks} - ${est.totalWeeks + 2} Weeks\n\nLooking forward to scheduling a technical discovery call.`;
             }
 
-            // Smooth scroll to contact
             const contactSection = document.getElementById('contact');
             if (contactSection) {
                 contactSection.scrollIntoView({ behavior: 'smooth' });
             }
-
-            showToast('Estimate transferred to inquiry form!');
+            showToast('Estimate transferred to consultation inquiry form!');
         });
     }
 
     // ----------------------------------------------------
-    // 6. PORTFOLIO FILTER & CASE STUDIES
+    // 7. TESTIMONIAL TICKER / CAROUSEL
     // ----------------------------------------------------
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const portfolioCards = document.querySelectorAll('.portfolio-card');
-
-    filterButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            const filterValue = btn.getAttribute('data-filter') || 'all';
-
-            portfolioCards.forEach(card => {
-                const category = card.getAttribute('data-category') || '';
-                if (filterValue === 'all' || category.includes(filterValue)) {
-                    card.classList.remove('hidden');
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0)';
-                    }, 50);
-                } else {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(15px)';
-                    setTimeout(() => {
-                        card.classList.add('hidden');
-                    }, 250);
-                }
-            });
-        });
-    });
-
-    // ----------------------------------------------------
-    // 7. PROJECT / CASE STUDY MODAL
-    // ----------------------------------------------------
-    const modal = document.getElementById('case-study-modal');
-    const modalBackdrop = document.getElementById('modal-backdrop');
-    const modalCloseBtn = document.getElementById('modal-close-btn');
-    const modalTitle = document.getElementById('modal-title');
-    const modalCategory = document.getElementById('modal-category');
-    const modalChallenge = document.getElementById('modal-challenge');
-    const modalSolution = document.getElementById('modal-solution');
-    const modalImpact = document.getElementById('modal-impact');
-    const modalStack = document.getElementById('modal-stack');
-
-    const projectData = {
-        'finflow': {
-            title: 'FinFlow — Cloud Financial Intelligence Platform',
-            category: 'Web Application / Cloud SaaS',
-            challenge: 'Enterprise finance teams needed real-time automated reconciliation, currency risk tracking, and compliance audits across 8 global subsidiaries with zero latency.',
-            solution: 'Engineered a multi-tenant web platform utilizing Next.js, Node.js microservices, PostgreSQL with connection pooling, and automated background transaction pipelines.',
-            impact: 'Reduced monthly reconciliation time by 74%, automated audit logging for SOC2 compliance, and securely handled $45M+ in monthly transaction indexing.',
-            stack: ['Next.js', 'TypeScript', 'Node.js', 'PostgreSQL', 'Docker', 'AWS ECS']
-        },
-        'logitrack': {
-            title: 'LogiTrack — Smart Fleet Telematics & Route Optimization',
-            category: 'Cross-Platform Mobile App & IoT',
-            challenge: 'A regional logistics carrier suffered from fuel wastage, disconnected drivers, and lack of real-time geofence tracking for 180+ transport vehicles.',
-            solution: 'Developed a high-performance Flutter mobile application paired with an event-driven Go backend, WebSockets for live GPS telemetry, and offline sync for remote zones.',
-            impact: 'Decreased average transit delay by 28%, saved ~19% in monthly fleet fuel consumption, and achieved a 4.9-star driver satisfaction rating.',
-            stack: ['Flutter', 'Dart', 'Go (Golang)', 'Redis', 'WebSockets', 'Google Maps API']
-        },
-        'healthbridge': {
-            title: 'HealthBridge — Telemedicine & Secure Patient Care Portal',
-            category: 'Healthcare Web & Mobile',
-            challenge: 'Healthcare providers required a HIPAA-compliant portal enabling secure HD video consultations, digital prescription dispatch, and electronic health record integration.',
-            solution: 'Architected an end-to-end encrypted telehealth portal with WebRTC video, biometric authentication, and FHIR standard compliant database connectors.',
-            impact: 'Facilitated 12,000+ virtual appointments in first quarter, reduced patient waiting room times from 45 min to under 3 min.',
-            stack: ['React', 'WebRTC', 'Python FastAPI', 'PostgreSQL', 'Docker', 'AWS HIPAA-Compliant VPC']
-        },
-        'insightai': {
-            title: 'InsightAI — Document Intelligence & Semantic Knowledge Hub',
-            category: 'Artificial Intelligence / NLP',
-            challenge: 'Legal and technical analysts were spending 15+ hours weekly manually reviewing 100+ page contracts and technical manuals to extract compliance clauses.',
-            solution: 'Deployed a custom Retrieval-Augmented Generation (RAG) pipeline with semantic vector search, high-accuracy OCR extraction, and an intuitive audit interface.',
-            impact: '91% acceleration in contract review turnaround, 99.2% extraction precision, and direct integration with existing corporate drive storage.',
-            stack: ['Python', 'LangChain', 'FastAPI', 'Qdrant Vector DB', 'React', 'Docker']
-        },
-        'swiftcommerce': {
-            title: 'SwiftCommerce — Headless E-Commerce with Edge Delivery',
-            category: 'Modern Web / Headless E-Commerce',
-            challenge: 'Legacy e-commerce store suffered from sluggish 4.2-second mobile load times, high cart abandonment, and poor mobile conversion rates during flash sales.',
-            solution: 'Rebuilt the frontend as a headless Progressive Web App (PWA) with Edge caching, dynamic product recommendations, and frictionless one-click checkout.',
-            impact: 'Sub-800ms average page loads worldwide, 41% jump in mobile conversions, and seamless zero-downtime scaling through Black Friday peak traffic.',
-            stack: ['Next.js 14', 'Tailwind CSS', 'Stripe API', 'Shopify Storefront API', 'Cloudflare Edge']
-        },
-        'nexuserp': {
-            title: 'Nexus ERP — Scalable Enterprise Operations Engine',
-            category: 'Custom Software & Enterprise ERP',
-            challenge: 'Manufacturing enterprise with 5 warehouses struggled with desynchronized inventories, manual purchase orders, and lack of real-time production analytics.',
-            solution: 'Constructed a unified, modular ERP platform with automated barcode scanning, multi-warehouse inventory dispatch, and executive real-time dashboards.',
-            impact: 'Eliminated stockout errors by 88%, automated purchase orders across 45 suppliers, and enabled real-time gross margin forecasting.',
-            stack: ['React', 'Python Django', 'Celery', 'PostgreSQL', 'Redis', 'Kubernetes']
-        }
-    };
-
-    function openModal(projectId) {
-        const data = projectData[projectId];
-        if (!data || !modal) return;
-
-        if (modalTitle) modalTitle.textContent = data.title;
-        if (modalCategory) modalCategory.textContent = data.category;
-        if (modalChallenge) modalChallenge.textContent = data.challenge;
-        if (modalSolution) modalSolution.textContent = data.solution;
-        if (modalImpact) modalImpact.textContent = data.impact;
-
-        if (modalStack) {
-            modalStack.innerHTML = data.stack.map(s => `<span class="tech-tag">${s}</span>`).join('');
-        }
-
-        modal.classList.add('active');
-        if (modalBackdrop) modalBackdrop.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeModal() {
-        if (!modal) return;
-        modal.classList.remove('active');
-        if (modalBackdrop) modalBackdrop.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    document.querySelectorAll('.open-modal-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const projectId = btn.getAttribute('data-project');
-            if (projectId) openModal(projectId);
-        });
-    });
-
-    if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
-    if (modalBackdrop) modalBackdrop.addEventListener('click', closeModal);
-
-    // ----------------------------------------------------
-    // 8. INTERACTIVE FAQ ACCORDION
-    // ----------------------------------------------------
-    const faqItems = document.querySelectorAll('.faq-item');
-
-    faqItems.forEach(item => {
-        const questionBtn = item.querySelector('.faq-question');
-        if (!questionBtn) return;
-
-        questionBtn.addEventListener('click', () => {
-            const isOpen = item.classList.contains('active');
-
-            // Close all others
-            faqItems.forEach(otherItem => {
-                if (otherItem !== item) {
-                    otherItem.classList.remove('active');
-                    const otherBtn = otherItem.querySelector('.faq-question');
-                    if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
-                }
-            });
-
-            // Toggle current
-            if (isOpen) {
-                item.classList.remove('active');
-                questionBtn.setAttribute('aria-expanded', 'false');
-            } else {
-                item.classList.add('active');
-                questionBtn.setAttribute('aria-expanded', 'true');
-            }
-        });
-    });
-
-    // ----------------------------------------------------
-    // 9. TESTIMONIAL CAROUSEL
-    // ----------------------------------------------------
-    const testimonialCards = document.querySelectorAll('.testimonial-card');
+    const testimonialCards = document.querySelectorAll('.le-testimonial-card');
     const prevTestimonialBtn = document.getElementById('prev-testimonial');
     const nextTestimonialBtn = document.getElementById('next-testimonial');
-    const testimonialDots = document.querySelectorAll('.testimonial-dot');
     let currentTestimonialIndex = 0;
-    let testimonialTimer = null;
 
     function showTestimonial(index) {
         if (!testimonialCards.length) return;
-
         if (index < 0) index = testimonialCards.length - 1;
         if (index >= testimonialCards.length) index = 0;
         currentTestimonialIndex = index;
@@ -525,52 +392,19 @@ document.addEventListener('DOMContentLoaded', () => {
         testimonialCards.forEach((card, i) => {
             card.classList.toggle('active', i === currentTestimonialIndex);
         });
-
-        testimonialDots.forEach((dot, i) => {
-            dot.classList.toggle('active', i === currentTestimonialIndex);
-        });
     }
 
-    function nextTestimonial() {
-        showTestimonial(currentTestimonialIndex + 1);
-    }
-
-    function prevTestimonial() {
-        showTestimonial(currentTestimonialIndex - 1);
-    }
-
-    if (nextTestimonialBtn) nextTestimonialBtn.addEventListener('click', () => {
-        nextTestimonial();
-        resetTestimonialTimer();
-    });
-
-    if (prevTestimonialBtn) prevTestimonialBtn.addEventListener('click', () => {
-        prevTestimonial();
-        resetTestimonialTimer();
-    });
-
-    testimonialDots.forEach((dot, i) => {
-        dot.addEventListener('click', () => {
-            showTestimonial(i);
-            resetTestimonialTimer();
-        });
-    });
-
-    function startTestimonialTimer() {
-        testimonialTimer = setInterval(nextTestimonial, 6000);
-    }
-
-    function resetTestimonialTimer() {
-        clearInterval(testimonialTimer);
-        startTestimonialTimer();
-    }
+    if (nextTestimonialBtn) nextTestimonialBtn.addEventListener('click', () => showTestimonial(currentTestimonialIndex + 1));
+    if (prevTestimonialBtn) prevTestimonialBtn.addEventListener('click', () => showTestimonial(currentTestimonialIndex - 1));
 
     if (testimonialCards.length > 1) {
-        startTestimonialTimer();
+        setInterval(() => {
+            showTestimonial(currentTestimonialIndex + 1);
+        }, 7000);
     }
 
     // ----------------------------------------------------
-    // 10. CONTACT FORM VALIDATION & SUBMISSION
+    // 8. CONTACT FORM VALIDATION & LEAD SUBMISSION
     // ----------------------------------------------------
     const contactForm = document.getElementById('project-contact-form');
     const formFeedback = document.getElementById('form-feedback');
@@ -580,18 +414,14 @@ document.addEventListener('DOMContentLoaded', () => {
         contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            // Form Fields
             const nameInput = document.getElementById('contact-name');
             const emailInput = document.getElementById('contact-email');
             const phoneInput = document.getElementById('contact-phone');
             const serviceInput = document.getElementById('contact-service');
             const budgetInput = document.getElementById('contact-budget');
-            const timelineInput = document.getElementById('contact-timeline');
             const messageInput = document.getElementById('contact-message');
 
             let isValid = true;
-
-            // Reset error styles
             document.querySelectorAll('.form-group').forEach(grp => grp.classList.remove('has-error'));
 
             function markError(input, msg) {
@@ -599,95 +429,81 @@ document.addEventListener('DOMContentLoaded', () => {
                 const grp = input.closest('.form-group');
                 if (grp) {
                     grp.classList.add('has-error');
-                    let errEl = grp.querySelector('.error-message');
-                    if (!errEl) {
-                        errEl = document.createElement('span');
-                        errEl.className = 'error-message';
-                        grp.appendChild(errEl);
+                    let err = grp.querySelector('.error-message');
+                    if (!err) {
+                        err = document.createElement('span');
+                        err = document.createElement('span');
+                        err.className = 'error-message';
+                        grp.appendChild(err);
                     }
-                    errEl.textContent = msg;
+                    err.textContent = msg;
                 }
             }
 
-            if (!nameInput.value.trim()) {
-                markError(nameInput, 'Please provide your full name');
-            }
-
+            if (!nameInput.value.trim()) markError(nameInput, 'Please provide your full name');
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailInput.value.trim()) {
-                markError(emailInput, 'Please provide your email address');
-            } else if (!emailPattern.test(emailInput.value.trim())) {
-                markError(emailInput, 'Please enter a valid email address');
+            if (!emailInput.value.trim() || !emailPattern.test(emailInput.value.trim())) {
+                markError(emailInput, 'Please provide a valid email address');
             }
-
             if (!messageInput.value.trim() || messageInput.value.trim().length < 10) {
-                markError(messageInput, 'Please write at least 10 characters describing your project');
+                markError(messageInput, 'Please enter at least 10 characters about your project');
             }
 
             if (!isValid) {
-                showToast('Please correct highlighted fields before submitting.', 'error');
+                showToast('Please complete all required fields.', 'error');
                 return;
             }
 
-            // Simulate submission state
             const originalBtnText = submitBtn.innerHTML;
             submitBtn.disabled = true;
             submitBtn.innerHTML = `
-                <svg class="spinner" width="18" height="18" viewBox="0 0 50 50">
-                    <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="5"></circle>
-                </svg> Sending Inquiry...
+                <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>
+                Submitting Inquiry...
             `;
 
-            const inquiryPayload = {
+            const payload = {
                 id: 'YATRA-' + Math.floor(100000 + Math.random() * 900000),
                 name: nameInput.value.trim(),
                 email: emailInput.value.trim(),
                 phone: phoneInput ? phoneInput.value.trim() : '',
                 service: serviceInput ? serviceInput.value : '',
                 budget: budgetInput ? budgetInput.value : '',
-                timeline: timelineInput ? timelineInput.value : '',
                 message: messageInput.value.trim(),
-                submittedAt: new Date().toISOString()
+                date: new Date().toISOString()
             };
 
             setTimeout(() => {
-                // Save to localStorage for safety / offline lead recovery
                 try {
-                    const existing = JSON.parse(localStorage.getItem('yatra_inquiries') || '[]');
-                    existing.push(inquiryPayload);
-                    localStorage.setItem('yatra_inquiries', JSON.stringify(existing));
+                    const existing = JSON.parse(localStorage.getItem('yatra_leads') || '[]');
+                    existing.push(payload);
+                    localStorage.setItem('yatra_leads', JSON.stringify(existing));
                 } catch (err) {
-                    console.warn('Could not store inquiry in local storage:', err);
+                    console.warn(err);
                 }
 
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalBtnText;
 
-                // Show success container
                 if (formFeedback) {
                     formFeedback.className = 'form-feedback success active';
                     formFeedback.innerHTML = `
-                        <div class="feedback-icon">✓</div>
+                        <div class="feedback-icon"><i class="fas fa-check"></i></div>
                         <div class="feedback-text">
                             <h4>Inquiry Successfully Received!</h4>
-                            <p>Thank you <strong>${escapeHtml(inquiryPayload.name)}</strong>. Reference ID: <code>${inquiryPayload.id}</code>. Our technology team will review your requirements and respond to <strong>${escapeHtml(inquiryPayload.email)}</strong> within 24 hours.</p>
+                            <p>Thank you <strong>${escapeHtml(payload.name)}</strong>. Reference ID: <code>${payload.id}</code>. Our engineering leads will review your project and email you at <strong>${escapeHtml(payload.email)}</strong> within 24 hours.</p>
                         </div>
                     `;
+                    formFeedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
 
                 contactForm.reset();
-                showToast('Inquiry sent successfully! Ref: ' + inquiryPayload.id, 'success');
-
-                // Smooth scroll to feedback message
-                if (formFeedback) {
-                    formFeedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            }, 1200);
+                showToast(`Inquiry received! Ref: ${payload.id}`, 'success');
+            }, 1100);
         });
     }
 
     // ----------------------------------------------------
-    // 11. NEWSLETTER SUBSCRIPTION
+    // 9. NEWSLETTER SUBSCRIPTION
     // ----------------------------------------------------
     const newsletterForm = document.getElementById('newsletter-form');
     if (newsletterForm) {
@@ -695,30 +511,14 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const input = document.getElementById('newsletter-email');
             if (input && input.value.trim()) {
-                showToast('Subscribed! Welcome to Yatra Tech briefings.', 'success');
+                showToast('Thank you for subscribing to Yatra Tech briefings!', 'success');
                 input.value = '';
             }
         });
     }
 
     // ----------------------------------------------------
-    // 12. COPY EMAIL ACTION
-    // ----------------------------------------------------
-    const copyEmailButtons = document.querySelectorAll('.copy-email-btn');
-    copyEmailButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const email = btn.getAttribute('data-email') || 'hello@yatratechnologies.com';
-            navigator.clipboard.writeText(email).then(() => {
-                showToast(`Copied ${email} to clipboard!`, 'success');
-            }).catch(() => {
-                showToast(`Email: ${email}`);
-            });
-        });
-    });
-
-    // ----------------------------------------------------
-    // 13. TOAST NOTIFICATION SYSTEM
+    // 10. TOAST NOTIFICATION SYSTEM
     // ----------------------------------------------------
     let toastContainer = document.getElementById('toast-container');
     if (!toastContainer) {
@@ -738,13 +538,12 @@ document.addEventListener('DOMContentLoaded', () => {
         toastContainer.appendChild(toast);
 
         setTimeout(() => toast.classList.add('show'), 10);
-
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => {
                 if (toast.parentElement) toast.parentElement.removeChild(toast);
             }, 300);
-        }, 3500);
+        }, 3600);
     }
 
     function escapeHtml(str) {
@@ -756,6 +555,5 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/'/g, '&#039;');
     }
 
-    // Expose showToast globally if needed
     window.yatraToast = showToast;
 });
